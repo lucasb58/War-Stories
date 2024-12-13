@@ -1,7 +1,0 @@
-Flask
-itsdangerous
-Jinja2
-MarkupSafe
-Werkzeug
-wheel
-gunicorn
