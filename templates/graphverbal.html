@@ -1,0 +1,56 @@
+{% extends "index.html" %}
+
+{% set active_page = "graphverbal" %}
+
+{% block title %}Sat Verbal Scores {% endblock %}
+
+
+
+{% block content %}
+	<h1 class="heading"> Verbal Graph </h1>
+	
+	<form>
+          <select name="state"> <!-- add onchange="this.form.submit()" to submit/update the form when an option is selected.  Usefull for then displaying county options. -->
+            {{ state_options }}
+          </select>
+          <br><br>
+          <input type="submit" value="Find State's Score" class= "green">
+    </form>
+
+	<h2 class="heading"> {{ title }} </h2>	
+
+<script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+  <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+<script>
+  window.onload = function () {
+    var chart = new CanvasJS.Chart("chartContainer",
+    {
+      axisX:{
+        title: "Years between 2005-2015", 
+		interval: 1, 
+		valueFormatString: "####"
+     },
+	 
+	axisY:{
+        title: " Verbal Scoress",
+		maximum: 800,
+		includeZero: false, 
+		minimum: 200
+     },
+      data: [
+      {
+        type: "column",
+		xValueFormatString: "####",
+        dataPoints: [
+        {{graph_verbal_points}}
+        ]
+      }
+      ]
+    });
+ 
+    chart.render();
+  }
+  </script>
+
+
+{% endblock %}
