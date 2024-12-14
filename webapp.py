@@ -14,6 +14,7 @@ import json
 app = Flask(__name__) #__name__ = "__main__" if this is the file that was run.  Otherwise, it is the name of the file (ex. webapp)
 
 app.debug = True #Change this to False for production
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #Remove once done debugging
 
 app.secret_key = os.environ['SECRET_KEY'] #used to sign session cookies
 oauth = OAuth(app)
@@ -52,6 +53,36 @@ except Exception as e:
 def inject_logged_in():
     is_logged_in = 'github_token' in session #this will be true if the token is in the session and false otherwise
     return {"logged_in":is_logged_in}
+    
+#redirect to GitHub's OAuth page and confirm callback URL
+@app.route('/login')
+def login():   
+    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return render_template('message.html', message='You were logged out')
+
+@app.route('/login/authorized')
+def authorized():
+    resp = github.authorized_response()
+    if resp is None:
+        session.clear()
+        message = 'Access denied: reason=' + request.args['error'] + ' error=' + request.args['error_description'] + ' full=' + pprint.pformat(request.args)      
+    else:
+        try:
+            session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
+            session['user_data']=github.get('user').data
+            #pprint.pprint(vars(github['/email']))
+            #pprint.pprint(vars(github['api/2/accounts/profile/']))
+            message='You were successfully logged in as ' + session['user_data']['login'] + '.'
+        except Exception as inst:
+            session.clear()
+            print(inst)
+            message='Unable to login, please try again.  '
+    return render_template('message.html', message=message)
+    
 
 #render home page
 @app.route("/")
@@ -72,48 +103,7 @@ def render_main_graph_math():
     place = "Verbal Scores in " + state + ", from 2005 to 2015."
     return render_template('graphmath.html', graph_math_points = mathscore,  state_options=states, title=place)
 
-#render page 1
-@app.route("/graphverbal")
-def render_main_graph_verbal():
-    states = get_state_options()
-    state = ""
-    if 'state' in request.args:
-        state = request.args['state']
-    else: 
-        state = 'AL'
-    verbalscore = get_verbal_scores(state)
-    print(state)
-    place = "Verbal Scores in " + state + ", from 2005 to 2015."
-    return render_template('graphverbal.html', graph_verbal_points = verbalscore, state_options=states, title=place)
 
-# render page 2
-@app.route("/mathscorebystate")
-def render_main_mathscorebystates():
-    states = get_state_options()
-    state = ""
-    if 'state' in request.args:
-        state = request.args['state']
-    else: 
-        state = 'AL'
-    print(state)    
-    averagescore = get_avg_math_score(state)
-    line = "The average math score in " + state + " is " + str(averagescore) + " from 2005 to 2015."
-    return render_template('mathscorebystate.html', title=line, state_options=states)
-
-#render page 3
-@app.route("/verbalscorebystate")
-def render_main_verbalscorebystates():
-    states = get_state_options()
-    state = ""
-    if 'state' in request.args:
-        state = request.args['state']
-    else: 
-        state = 'AL'
-    print(state)    
-    averagescore = get_avg_verbal_score(state)
-    line = "The average math score in " + state + " is " + str(averagescore) + " from 2005 to 2015."
-    return render_template('verbalscorebystate.html', title=line, state_options=states)         
- 
 #select state 
 def get_state_options():
     with open('school_scores.json') as scores_data:
@@ -140,49 +130,7 @@ def get_math_scores(state):
     graph_math_points= ""
     for key, value in mathscore.items():
         graph_math_points= graph_math_points + Markup('{ x: ' + str(key) + ', y: ' + str(value) + ' },')        
-    return graph_math_points 
-
-#x and y values for verbal scores     
-def get_verbal_scores(state):
-    with open('school_scores.json') as scores_data:
-        sat_scores = json.load(scores_data)
-    verbalscore={}
-    for v in sat_scores:      
-        if v['State']['Code']== state:
-            verbalscore[v['Year']] = v['Total']['Verbal']
-    print(verbalscore)   
-    graph_verbal_points= ""
-    for key, value in verbalscore.items():
-        graph_verbal_points = graph_verbal_points + Markup('{ x: ' + str(key) + ', y: ' + str(value) + ' },')
-    return graph_verbal_points
-
-# avg math score by state 
-def get_avg_math_score(state):
-    with open('school_scores.json') as scores_data:
-        sat_scores = json.load(scores_data)
-    mathavgscore = 0
-    num = 0
-    for m in sat_scores:      
-        if m['State']['Code']== state:
-            mathavgscore = mathavgscore + m['Total']['Math']
-            num = num + 1
-    mathavgscore = round(mathavgscore/num)    
-    print(mathavgscore)
-    return mathavgscore
-
-# avg verbal score by state
-def get_avg_verbal_score(state):
-    with open('school_scores.json') as scores_data:
-        sat_scores = json.load(scores_data)
-    verbalavgscore = 0
-    num = 0
-    for m in sat_scores:      
-        if m['State']['Code']== state:
-            verbalavgscore = verbalavgscore + m['Total']['Verbal']
-            num = num + 1
-    verbalavgscore = round(verbalavgscore/num)    
-    print(verbalavgscore)
-    return verbalavgscore           
+    return graph_math_points    
 
 @app.route('/googleb4c3aeedcc2dd103.html')
 def render_google_verification():
