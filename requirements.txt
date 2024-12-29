@@ -1,7 +1,11 @@
-Flask
+
 itsdangerous
 Jinja2
 MarkupSafe
-Werkzeug
+Werkzeug>=2.2,<3.0
 wheel
 gunicorn
+Flask-OAuthlib
+OAuth
+pymongo
+

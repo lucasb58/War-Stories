@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="home">
+  <h1>Home</h1>
+</div>
+
+<p>Welcome to our forum! This site is meant for you to share your favorite cartoons and talk about your
+experiences with them. You can talk about your favorite characters, fandom, your favorite episodes, 
+and more! Click "post" to begin sharing!</p>
+
+<div class="container mt-3">
+  {% for post in posts %}
+  <div class="card-header">
+  {{ post.Author|e }}
+  </div>
+	<div class="card">
+		<div class="card-body">{{ post.Text|e }}</div>
+	</div>
+  {% endfor %}
+</div>
+	
+{% endblock %}

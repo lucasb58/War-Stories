@@ -1,20 +1,20 @@
-from flask import Flask, url_for, render_template, request 
-from markupsafe import Markup
 import pymongo
 from flask import Flask, redirect, url_for, session, request, jsonify
 from flask_oauthlib.client import OAuth
 #from flask_oauthlib.contrib.apps import github #import to make requests to GitHub's OAuth
+from flask import render_template
 
 import pprint
 import os
 
-import os
-import json
+# This code originally from https://github.com/lepture/flask-oauthlib/blob/master/example/github.py
+# Edited by P. Conrad for SPIS 2016 to add getting Client Id and Secret from
+# environment variables, so that this will work on Heroku.
+# Edited by S. Adams for Designing Software for the Web to add comments and remove flash messaging
 
-app = Flask(__name__) #__name__ = "__main__" if this is the file that was run.  Otherwise, it is the name of the file (ex. webapp)
+app = Flask(__name__)
 
-app.debug = True #Change this to False for production
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #Remove once done debugging
+app.debug = False #Change this to False for production
 
 app.secret_key = os.environ['SECRET_KEY'] #used to sign session cookies
 oauth = OAuth(app)
@@ -53,11 +53,18 @@ except Exception as e:
 def inject_logged_in():
     is_logged_in = 'github_token' in session #this will be true if the token is in the session and false otherwise
     return {"logged_in":is_logged_in}
-    
+
+@app.route('/')
+def home():
+    posts=[]
+    for doc in collection.find():
+        posts.append(doc)
+    return render_template('home.html', posts=posts)
+
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
 def login():   
-    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
+    return github.authorize(callback=url_for('authorized', _external=True, _scheme='https')) #callback URL must match the pre-configured callback URL
 
 @app.route('/logout')
 def logout():
@@ -77,60 +84,36 @@ def authorized():
             #pprint.pprint(vars(github['/email']))
             #pprint.pprint(vars(github['api/2/accounts/profile/']))
             message='You were successfully logged in as ' + session['user_data']['login'] + '.'
+            print("logged in")
         except Exception as inst:
             session.clear()
             print(inst)
             message='Unable to login, please try again.  '
     return render_template('message.html', message=message)
-    
-
-#render home page
-@app.route("/")
-def render_main():
-    return render_template('home.html')
-
-#render page 0    
-@app.route("/graphmath")
-def render_main_graph_math():
-    states = get_state_options()
-    state = ""
-    if 'state' in request.args:
-        state = request.args['state']
-    else: 
-        state = 'AL'
-    mathscore = get_math_scores(state)
-    print(state)
-    place = "Verbal Scores in " + state + ", from 2005 to 2015."
-    return render_template('graphmath.html', graph_math_points = mathscore,  state_options=states, title=place)
 
 
-#select state 
-def get_state_options():
-    with open('school_scores.json') as scores_data:
-        state = json.load(scores_data)
-    states=[]
-    for c in state:
-        if c["State"]["Code"] not in states:
-            states.append(c["State"]["Code"])
-    print(states)        
-    options=""
-    for s in states:
-        options += Markup("<option value=\"" + s + "\">" + s + "</option>") #Use Markup so <, >, " are not escaped lt, gt, etc.
-    return options
+@app.route('/post', methods=['GET','POST'])
+def renderPost():
+    if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+    else:
+        user_data_pprint = '';
+    if "writing" in request.form:   
+        session["writing"]=request.form['writing']
+        author =session['user_data']['login']
+        doc = {"Author":author,'Text':request.form['writing']}
+        collection.insert_one(doc)
+        print(request.form['writing'])
+        return redirect(url_for('home'))
+    return render_template('post.html',dump_user_data=user_data_pprint, )
 
-#x and y values for math scores 
-def get_math_scores(state):
-    with open('school_scores.json') as scores_data:
-        sat_scores = json.load(scores_data)
-    mathscore={}
-    for m in sat_scores:      
-        if m['State']['Code']== state:
-            mathscore[str(m['Year'])] = m['Total']['Math']
-    print(mathscore)
-    graph_math_points= ""
-    for key, value in mathscore.items():
-        graph_math_points= graph_math_points + Markup('{ x: ' + str(key) + ', y: ' + str(value) + ' },')        
-    return graph_math_points    
+@app.route('/logintopost')
+def renderLogintopost():
+    if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+    else:
+          user_data_pprint = '';
+    return render_template('logintopost.html', dump_user_data=user_data_pprint)
 
 @app.route('/googleb4c3aeedcc2dd103.html')
 def render_google_verification():
@@ -140,6 +123,12 @@ def render_google_verification():
 @github.tokengetter
 def get_github_oauth_token():
     return session['github_token']
+    
 
-if __name__=="__main__":
-    app.run(debug=True)
+
+    
+
+
+if __name__ == '__main__':
+    app.run()
+
