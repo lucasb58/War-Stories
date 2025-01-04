@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}post{% endblock %}
+
+{% block content %}
+  <h1>This is your place to share your cartoons!</h1>
+
+<form action="/post" method="post">
+  <label for="prompt">Type Away!:</label>
+  <br>
+  <input type="text" name="writing" >
+  <br>
+  <input type="submit" value="Submit">
+</form> 
+
+
+{% endblock %}
