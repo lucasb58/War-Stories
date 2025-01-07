@@ -77,7 +77,7 @@ def logout():
 def authorized():
     resp = github.authorized_response()
     if resp is None:
-        session.clear()
+        #session.clear()
         message = 'Access denied: reason=' + request.args['error'] + ' error=' + request.args['error_description'] + ' full=' + pprint.pformat(request.args)      
     else:
         try:
@@ -89,7 +89,7 @@ def authorized():
             message='You were successfully logged in as ' + session['user_data']['login'] + '.'
             print("logged in")
         except Exception as inst:
-            session.clear()
+            #session.clear()
             print(inst)
             message='Unable to login, please try again.  '
     return render_template('message.html', message=message)
@@ -97,20 +97,20 @@ def authorized():
 
 @app.route('/post', methods=['GET','POST'])
 def renderPost():
-    if 'user_data' in session:
-        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
-    else:
-        user_data_pprint = '';
-    if "writing" in request.form:   
-        print(session)
-        session["writing"]=request.form['writing']
-        author=session['user_data']['login']
-        doc = {"Author":author,'Text':request.form['writing']}
-        collection.insert_one(doc)
-        print(request.form['writing'])
-        return redirect(url_for('home'))
-    return render_template('post.html',dump_user_data=user_data_pprint, )
-
+	if 'user_data' in session:
+		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+	else:
+		user_data_pprint = '';
+	if "writing" in request.form:
+		print(session)
+		session["writing"]=request.form['writing']
+		author=session['user_data']['login']
+		doc = {"Author":author,'Text':request.form['writing']}
+		collection.insert_one(doc)
+		print(request.form['writing'])
+		return redirect(url_for('home'))
+	return render_template('post.html', dump_user_data=user_data_pprint)
+	
 @app.route('/logintopost')
 def renderLogintopost():
     if 'user_data' in session:
