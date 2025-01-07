@@ -64,7 +64,9 @@ def home():
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
 def login():   
-    return github.authorize(callback=url_for('authorized', _external=True, _scheme='https')) #callback URL must match the pre-configured callback URL
+    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #Remove once done running locally
 
 @app.route('/logout')
 def logout():
@@ -83,6 +85,7 @@ def authorized():
             session['user_data']=github.get('user').data
             #pprint.pprint(vars(github['/email']))
             #pprint.pprint(vars(github['api/2/accounts/profile/']))
+            print(session)
             message='You were successfully logged in as ' + session['user_data']['login'] + '.'
             print("logged in")
         except Exception as inst:
@@ -99,8 +102,9 @@ def renderPost():
     else:
         user_data_pprint = '';
     if "writing" in request.form:   
+        print(session)
         session["writing"]=request.form['writing']
-        author =session['user_data']['login']
+        author=session['user_data']['login']
         doc = {"Author":author,'Text':request.form['writing']}
         collection.insert_one(doc)
         print(request.form['writing'])
