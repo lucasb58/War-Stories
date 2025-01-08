@@ -118,6 +118,18 @@ def renderLogintopost():
     else:
           user_data_pprint = '';
     return render_template('logintopost.html', dump_user_data=user_data_pprint)
+    
+"""def addLikes():
+	if 'user_data' in session:
+		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+	else:
+		user_data_pprint = '';
+	if "likes" in request.form: 
+		session["likes"]=request.form["likes"]
+		doc = {"likes":Like}
+		collection.insert_one(doc)
+	return likes"""
+    
 
 @app.route('/googleb4c3aeedcc2dd103.html')
 def render_google_verification():

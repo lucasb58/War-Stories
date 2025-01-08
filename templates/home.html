@@ -18,7 +18,16 @@ and more! Click "post" to begin sharing!</p>
   </div>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
+		<form action="/post" method="post">
+  			<br>
+  			<input type="submit" value="Submit">
+  			<button type="button" class="btn">Like</button>
+		</form> 
 	</div>
+	
+
+	
+	
   {% endfor %}
 </div>
 	
