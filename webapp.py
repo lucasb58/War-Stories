@@ -125,7 +125,7 @@ def renderLogintopost():
 	else:
 		user_data_pprint = '';
 	if "likes" in request.form: 
-		session["likes"]=request.form["likes"]
+		session["likes"]=request.form["likes"] + 1
 		doc = {"likes":Like}
 		collection.insert_one(doc)
 	return likes"""

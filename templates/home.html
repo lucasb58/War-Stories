@@ -19,15 +19,13 @@ and more! Click "post" to begin sharing!</p>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
 		<form action="/post" method="post">
+  			<label for="prompt">Comments</label>
+  			<br>
+  			<textarea class="form-control" rows="3" id="comment" name="text"></textarea>
   			<br>
   			<input type="submit" value="Submit">
-  			<button type="button" class="btn">Like</button>
 		</form> 
 	</div>
-	
-
-	
-	
   {% endfor %}
 </div>
 	
