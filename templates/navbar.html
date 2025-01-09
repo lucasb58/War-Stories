@@ -6,6 +6,9 @@
       <li class="nav-item">
         <a {% if active_page == "home" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/">Home</a>
       </li>
+	   <li class="nav-item">
+        <a {% if active_page == "savepost" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/savepost">Saved Posts</a>
+      </li>
 	<li class="nav-item">
         {% if logged_in %}
 			

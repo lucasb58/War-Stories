@@ -60,6 +60,13 @@ def home():
     for doc in collection.find():
         posts.append(doc)
     return render_template('home.html', posts=posts)
+    
+@app.route('/savepost')
+def savepost():
+    posts=[]
+    for doc in collection.find():
+        posts.append(doc)
+    return render_template('savepost.html', posts=posts)
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
