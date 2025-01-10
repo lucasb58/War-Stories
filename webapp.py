@@ -102,12 +102,10 @@ def renderPost():
 	else:
 		user_data_pprint = '';
 	if "writing" in request.form:
-		print(session)
 		session["writing"]=request.form['writing']
 		author=session['user_data']['login']
 		doc = {"Author":author,'Text':request.form['writing']}
 		collection.insert_one(doc)
-		print(request.form['writing'])
 		return redirect(url_for('home'))
 	return render_template('post.html', dump_user_data=user_data_pprint)
 	
@@ -118,6 +116,21 @@ def renderLogintopost():
     else:
           user_data_pprint = '';
     return render_template('logintopost.html', dump_user_data=user_data_pprint)
+    
+def addComments(methods=['GET','POST']):
+	if 'user_data' in session:
+		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+	else:
+		user_data_pprint = '';
+	parent_filter = {'_id': 'parent_document_id'}
+	if "comments" in request.form:
+		author=session['user_data']['login']
+		new_sub_document = { "Author": author,'Comments': request.form['writing']}
+		result = collection.update_one( filter, {'$push': {'Comments': new_sub_document}})
+		return redirect(url_for('home'))
+	return render_template('post.html', dump_user_data=user_data_pprint)
+	
+    
     
 """def addLikes():
 	if 'user_data' in session:
