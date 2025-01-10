@@ -64,14 +64,17 @@ def home():
 @app.route('/savepost')
 def savepost():
     posts=[]
-    for doc in collection.find():
-        posts.append(doc)
+    if "user_data" in session:
+        for doc in collection.find():
+            for user in doc["savedby"]:
+                if user == session["user_data"]["login"]:
+                    posts.append(doc)
     return render_template('savepost.html', posts=posts)
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
 def login():   
-    return github.authorize(callback=url_for('authorized', _external=True, _scheme='https')) #callback URL must match the pre-configured callback URL
+    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
 
 @app.route('/logout')
 def logout():
