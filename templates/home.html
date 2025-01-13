@@ -18,13 +18,22 @@ and more! Click "post" to begin sharing!</p>
   </div>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
-		<form action="/post" method="post">
+		
+		<form action="/addcomments" method="post">
   			<label for="prompt">Comments</label>
   			<br>
-  			<textarea class="form-control" rows="3" id="comment" name="text"></textarea>
+  			<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
   			<br>
+  			<input type="hidden" name="post.id" value= "{{ post._id|e }}">
   			<input type="submit" value="Submit">
-		</form> 
+		</form>
+		{% for comments in addComments %}
+			<div class="card-body">
+			{{ comments.Author|e }}
+			<br>
+			{{ comments.Text|e }}
+			</div>
+		{% endfor %}
 	</div>
   {% endfor %}
 </div>

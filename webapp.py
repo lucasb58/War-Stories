@@ -3,7 +3,7 @@ from flask import Flask, redirect, url_for, session, request, jsonify
 from flask_oauthlib.client import OAuth
 #from flask_oauthlib.contrib.apps import github #import to make requests to GitHub's OAuth
 from flask import render_template
-
+from bson.objectid import ObjectId
 import pprint
 import os
 
@@ -59,7 +59,10 @@ def home():
     posts=[]
     for doc in collection.find():
         posts.append(doc)
-    return render_template('home.html', posts=posts)
+    addComments=[]
+    for doc in collection.find():
+    	addComments.append(doc)
+    return render_template('home.html', posts=posts, addComments=addComments)
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
@@ -117,18 +120,23 @@ def renderLogintopost():
           user_data_pprint = '';
     return render_template('logintopost.html', dump_user_data=user_data_pprint)
     
-def addComments(methods=['GET','POST']):
+@app.route('/addcomments', methods=['GET','POST'])
+def addComments():
 	if 'user_data' in session:
 		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
 	else:
 		user_data_pprint = '';
-	parent_filter = {'_id': 'parent_document_id'}
+	parent_filter = {'_id': request.form['post.id']}
 	if "comments" in request.form:
 		author=session['user_data']['login']
-		new_sub_document = { "Author": author,'Comments': request.form['writing']}
-		result = collection.update_one( filter, {'$push': {'Comments': new_sub_document}})
+		new_sub_document = { "Author": author,'Comments': request.form['comments']}
+		print(request.form['comments'])
+		#collection.append( parent_filter, {'$push': {'Comments': new_sub_document}})
+		for doc in collection.find({"_id": ObjectID(request.form["post.id"])}):
+			doc["Comments"].append(new_sub_document)
+			 
 		return redirect(url_for('home'))
-	return render_template('post.html', dump_user_data=user_data_pprint)
+	return redirect(url_for('home'))
 	
     
     
