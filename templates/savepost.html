@@ -8,12 +8,12 @@
 </div>
 
 <div class="container mt-3">
-  {% for post in posts %}
+  {% for savedposts in savedposts %}
   <div class="card-header">
-  {{ post.Author|e }}
+  {{ saveposts.Author|e }}
   </div>
 	<div class="card">
-		<div class="card-body">{{ post.Text|e }}</div>
+		<div class="card-body">{{ savedposts.Text|e }}</div>
 	</div>
   {% endfor %}
 </div>

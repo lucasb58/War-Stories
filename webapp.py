@@ -3,6 +3,7 @@ from flask import Flask, redirect, url_for, session, request, jsonify
 from flask_oauthlib.client import OAuth
 #from flask_oauthlib.contrib.apps import github #import to make requests to GitHub's OAuth
 from flask import render_template
+from bson.objectid import ObjectId
 
 import pprint
 import os
@@ -61,15 +62,23 @@ def home():
         posts.append(doc)
     return render_template('home.html', posts=posts)
     
-@app.route('/savepost')
+@app.route('/savepost', methods=['GET','POST'])
 def savepost():
-    posts=[]
-    if "user_data" in session:
-        for doc in collection.find():
-            for user in doc["savedby"]:
-                if user == session["user_data"]["login"]:
-                    posts.append(doc)
-    return render_template('savepost.html', posts=posts)
+    if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+        if "savepost" in request.form:
+            holder=session['user_data']['login']
+            new_sub_document = { "savedby": holder}
+            result = collection.update_one(
+                {"_id": ObjectId(request.form["post.id"])},
+                {"$push": {"savedby": new_sub_document}}
+            )
+    savedposts=[]
+    for doc in collection.find():
+       if session['user_date']['login']=="savedby":
+            savedposts.append(doc)
+    return render_template('savepost.html', savedposts=savedposts)
+
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')

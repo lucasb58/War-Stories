@@ -19,10 +19,9 @@ received along the way. Have fun discovering the wonders and experiences of war 
   </div>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
-		<form action="/">
-			<input type="hidden" name="id" value="{{ post._id|e }}">
-			
-			<button type="submit" class="btn btn-warning" style="width: 10%;">Save</button>
+		<form action="/savepost" method = "post">
+			<input type="hidden" name="post.id" value="{{ post._id|e }}">
+			<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
 		</form>
 	</div>
   {% endfor %}
