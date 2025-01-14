@@ -132,9 +132,13 @@ def addComments():
 		new_sub_document = { "Author": author,'Comments': request.form['comments']}
 		print(request.form['comments'])
 		#collection.append( parent_filter, {'$push': {'Comments': new_sub_document}})
-		for doc in collection.find({"_id": ObjectID(request.form["post.id"])}):
-			doc["Comments"].append(new_sub_document)
-			 
+		#print(ObjectID(request.form["post.id"]))
+		#for doc in collection.find({"_id": ObjectId(request.form["post.id"])}):
+			#doc["Comments"].append(new_sub_document)
+		result = collection.update_one(
+    		{"_id": ObjectId(request.form["post.id"])},
+    		{"$push": {"Comments": new_sub_document}}
+		)
 		return redirect(url_for('home'))
 	return redirect(url_for('home'))
 	
