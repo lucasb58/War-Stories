@@ -57,6 +57,12 @@ def inject_logged_in():
 
 @app.route('/')
 def home():
+    #check=""
+    #if 'user_data' in session and "savepost" in request.form:
+    #    check = "1"
+    #elif 'user_data'=="" and "savepost" in request.form:
+       #check = "0"
+    #print(check)
     posts=[]
     for doc in collection.find():
         posts.append(doc)
@@ -65,18 +71,19 @@ def home():
 @app.route('/savepost', methods=['GET','POST'])
 def savepost():
     if 'user_data' in session:
+    
         user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
         if "savepost" in request.form:
             holder=session['user_data']['login']
-            new_sub_document = { "savedby": holder}
             result = collection.update_one(
                 {"_id": ObjectId(request.form["post.id"])},
-                {"$push": {"savedby": new_sub_document}}
+                {"$push": {"savedby": holder}}
             )
     savedposts=[]
     for doc in collection.find():
-       if session['user_date']['login']=="savedby":
-            savedposts.append(doc)
+        for user in doc['savedby']:
+           if session['user_data']['login']==user:
+                savedposts.append(doc)
     return render_template('savepost.html', savedposts=savedposts)
 
 
