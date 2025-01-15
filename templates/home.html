@@ -27,13 +27,9 @@ and more! Click "post" to begin sharing!</p>
   			<input type="hidden" name="post.id" value= "{{ post._id|e }}">
   			<input type="submit" value="Submit">
 		</form>
-		{% for comments in addComments %}
-			<div class="card-body">
-			{{ comments.Author|e }}
-			<br>
-			{{ comments.Text|e }}
-			</div>
-		{% endfor %}
+		{{ post.Comments.Author|e }}
+		<br>
+		{{ post.Comments.Text|e }}
 	</div>
   {% endfor %}
 </div>

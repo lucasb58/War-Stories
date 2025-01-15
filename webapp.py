@@ -59,10 +59,7 @@ def home():
     posts=[]
     for doc in collection.find():
         posts.append(doc)
-    addComments=[]
-    for doc in collection.find():
-    	addComments.append(doc)
-    return render_template('home.html', posts=posts, addComments=addComments)
+    return render_template('home.html', posts=posts)
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
