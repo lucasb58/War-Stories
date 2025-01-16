@@ -59,7 +59,13 @@ def home():
     posts=[]
     for doc in collection.find():
         posts.append(doc)
-    return render_template('home.html', posts=posts)
+    comments=[]
+    parent_filter = {'_id': request.form['post.id']}
+    for doc in collection.find():
+        for blog in doc['Comments']:
+           if parent_filter==blog:
+                comments.append(doc)
+    return render_template('home.html', posts=posts, comments=comments)
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
@@ -125,13 +131,8 @@ def addComments():
 		user_data_pprint = '';
 	parent_filter = {'_id': request.form['post.id']}
 	if "comments" in request.form:
-		author=session['user_data']['login']
-		new_sub_document = { "Author": author,'Comments': request.form['comments']}
-		print(request.form['comments'])
-		#collection.append( parent_filter, {'$push': {'Comments': new_sub_document}})
-		#print(ObjectID(request.form["post.id"]))
-		#for doc in collection.find({"_id": ObjectId(request.form["post.id"])}):
-			#doc["Comments"].append(new_sub_document)
+		user=session['user_data']['login']
+		new_sub_document = { "user": user,'text': request.form['comments']}
 		result = collection.update_one(
     		{"_id": ObjectId(request.form["post.id"])},
     		{"$push": {"Comments": new_sub_document}}
