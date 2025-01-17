@@ -72,21 +72,21 @@ def home():
 def savepost():
     if 'user_data' in session:
         user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+        if "savepost" in request.form:
+            holder=session['user_data']['login']
+            result = collection.update_one(
+                {"_id": ObjectId(request.form["post.id"])},
+                {"$push": {"savedby": holder}}
+            )
+        savedposts=[]
+        for doc in collection.find():
+            for user in doc['savedby']:
+               if session['user_data']['login']==user:
+                    savedposts.append(doc)
+        return render_template('savepost.html', savedposts=savedposts)
     else:
         user_data_pprint = '';
-       
-    if "savepost" in request.form:
-        holder=session['user_data']['login']
-        result = collection.update_one(
-            {"_id": ObjectId(request.form["post.id"])},
-            {"$push": {"savedby": holder}}
-        )
-    savedposts=[]
-    for doc in collection.find():
-        for user in doc['savedby']:
-           if session['user_data']['login']==user:
-                savedposts.append(doc)
-    return render_template('savepost.html', savedposts=savedposts)
+    return render_template('savepost.html')
 
 
 #redirect to GitHub's OAuth page and confirm callback URL

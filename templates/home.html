@@ -12,7 +12,7 @@ other people they know personally or know of. Users are able to talk about both 
 of war and the powerful stories of heroes. They are also able to share the metals and awards that were
 received along the way. Have fun discovering the wonders and experiences of war life!</p>
 
-<div class="d-flex justify-content-center align-items-center">
+<div id="message" class="d-flex justify-content-center align-items-center">
   <div class="alert alert-info w-25">
 	<strong>Hi There!</strong> Make sure to log in before saving or creating posts!
   </div>
@@ -25,10 +25,14 @@ received along the way. Have fun discovering the wonders and experiences of war 
   </div>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
-		<form action="/savepost" method = "post">
-			<input type="hidden" name="post.id" value="{{ post._id|e }}">
-			<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
-		</form>
+		<!--{% if logged_in %}
+			<form action="/savepost" method = "post">
+				<input type="hidden" name="post.id" value="{{ post._id|e }}">
+				<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
+			</form>
+		{% else %}
+			<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
+		{% endif %}-->
 	</div>
   {% endfor %}
 </div>
