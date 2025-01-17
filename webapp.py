@@ -59,13 +59,7 @@ def home():
     posts=[]
     for doc in collection.find():
         posts.append(doc)
-    comments=[]
-    parent_filter = {'_id': request.form['post.id']}
-    for doc in collection.find():
-        for blog in doc['Comments']:
-           if parent_filter==blog:
-                comments.append(doc)
-    return render_template('home.html', posts=posts, comments=comments)
+    return render_template('home.html', posts=posts)
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
@@ -139,20 +133,6 @@ def addComments():
 		)
 		return redirect(url_for('home'))
 	return redirect(url_for('home'))
-	
-    
-    
-"""def addLikes():
-	if 'user_data' in session:
-		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
-	else:
-		user_data_pprint = '';
-	if "likes" in request.form: 
-		session["likes"]=request.form["likes"] + 1
-		doc = {"likes":Like}
-		collection.insert_one(doc)
-	return likes"""
-    
 
 @app.route('/googleb4c3aeedcc2dd103.html')
 def render_google_verification():
