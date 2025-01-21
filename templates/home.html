@@ -26,16 +26,20 @@ received along the way. Have fun discovering the wonders and experiences of war 
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
 
+
+		<label class = "show" > Add a comment </label>
+	
+		<div>			
+			<form action="/addcomments" method="post">
+  					<br>
+  					<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
+  					<br>
+  					<input type="hidden" name="post.id" value= "{{ post._id|e }}">
+  					<input type="submit" value="Submit">
+			</form>
+		</div>
 		
-		<form action="/addcomments" method="post">
-  			<label for="prompt">Comments</label>
-  			<br>
-  			<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
-  			<br>
-  			<input type="hidden" name="post.id" value= "{{ post._id|e }}">
-  			<input type="submit" value="Submit">
-		</form>
-		
+		<label>Comments</label>
 		{% for comments in post.Comments %}
 		{{ comments.user|e }}
 		<br>

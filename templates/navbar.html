@@ -25,9 +25,9 @@
       	{% if logged_in %}
 				{% endif %}
 				{% if logged_in %}
-			<a href="/logout">Logout</a>
+			<a {% if active_page == "logout" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/logout">Logout</a>
 				{% else %}
-			<a href="/login">Login</a>
+			<a {% if active_page == "login" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/login">Login</a>
 				{% endif %}
 	</li>
     </ul>
