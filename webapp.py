@@ -81,13 +81,31 @@ def savepost():
         savedposts=[]
         for doc in collection.find():
             for user in doc['savedby']:
-               if session['user_data']['login']==user:
+               if session['user_data']['login']==user and doc not in savedposts:
                     savedposts.append(doc)
         return render_template('savepost.html', savedposts=savedposts)
     else:
         user_data_pprint = '';
     return render_template('savepost.html')
-
+@app.route('/unsavepost', methods=['GET', 'POST'])
+def unsavepost():
+    if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+        holder=session['user_data']['login']
+        result = collection.update_one(
+            {"_id": ObjectId(request.form["post.id"])},
+            {"$pull": {"savedby": holder}}
+        )
+        savedposts=[]
+        for doc in collection.find():
+            for user in doc['savedby']:
+               if session['user_data']['login']==user and doc not in savedposts:
+                    savedposts.append(doc)
+        return render_template('savepost.html', savedposts=savedposts)
+    else:
+        user_data_pprint = '';
+    return render_template('savepost.html')
+    
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
@@ -134,7 +152,7 @@ def renderPost():
 		print(session)
 		session["writing"]=request.form['writing']
 		author=session['user_data']['login']
-		doc = {"Author":author,'Text':request.form['writing']}
+		doc = {"Author":author,'Text':request.form['writing'], "savedby": [], "Comments": []}
 		collection.insert_one(doc)
 		print(request.form['writing'])
 		return redirect(url_for('home'))
