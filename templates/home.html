@@ -7,9 +7,16 @@
   <h1>Home</h1>
 </div>
 
-<p>Welcome to our forum! This site is meant for you to share your favorite cartoons and talk about your
-experiences with them. You can talk about your favorite characters, fandom, your favorite episodes, 
-and more! Click "post" to begin sharing!</p>
+<p>Welcome to our forum! This site is meant for people to either share their own war stories or those of 
+other people they know personally or know of. Users are able to talk about both the gruesome and gory parts
+of war and the powerful stories of heroes. They are also able to share the metals and awards that were
+received along the way. Have fun discovering the wonders and experiences of war life!</p>
+
+<div id="message" class="d-flex justify-content-center align-items-center">
+  <div class="alert alert-info w-25">
+	<strong>Hi There!</strong> Make sure to log in before saving or creating posts!
+  </div>
+</div>
 
 <div class="container mt-3">
   {% for post in posts %}
@@ -18,6 +25,7 @@ and more! Click "post" to begin sharing!</p>
   </div>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
+
 		
 		<form action="/addcomments" method="post">
   			<label for="prompt">Comments</label>
@@ -35,6 +43,16 @@ and more! Click "post" to begin sharing!</p>
 		{% endfor %}
 		
 		<br>
+  
+		{% if logged_in %}
+			<form action="/savepost" method = "post">
+				<input type="hidden" name="post.id" value="{{ post._id|e }}">
+				<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
+			</form>
+		{% else %}
+			<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
+		{% endif %}
+
 	</div>
   {% endfor %}
 </div>

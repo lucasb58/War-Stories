@@ -1,0 +1,5 @@
+set SECRET_KEY=Gundam
+set GITHUB_CLIENT_ID=Ov23likleg4r8mdDwIUB
+set GITHUB_CLIENT_SECRET=6e039e70158b8475b3a1cb029685e018f8f8b084
+set MONGO_DBNAME=WarDB
+set MONGO_CONNECTION_STRING=mongodb+srv://mrlucasblessing:9qMu55uSJ7z2cKuD@cluster0.u9xfw.mongodb.net/?retryWrites=true

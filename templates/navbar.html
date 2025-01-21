@@ -1,9 +1,14 @@
+
+  
 <nav class="navbar navbar-expand-sm bg-light">
 
   <div class="container-fluid">
     <ul class="navbar-nav">
       <li class="nav-item">
         <a {% if active_page == "home" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/">Home</a>
+      </li>
+	   <li class="nav-item">
+        <a {% if active_page == "savepost" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/savepost">Saved Posts</a>
       </li>
 	<li class="nav-item">
         {% if logged_in %}
@@ -20,13 +25,12 @@
       	{% if logged_in %}
 				{% endif %}
 				{% if logged_in %}
-			<a {% if active_page == "logout" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/logout">Logout</a>
+			<a href="/logout">Logout</a>
 				{% else %}
-			<a {% if active_page == "login" %} class="nav-link active" {% else %} class="nav-link"{% endif %} href="/login">Login</a>
+			<a href="/login">Login</a>
 				{% endif %}
 	</li>
     </ul>
   </div>
 
 </nav>
-
