@@ -25,14 +25,14 @@ received along the way. Have fun discovering the wonders and experiences of war 
   </div>
 	<div class="card">
 		<div class="card-body">{{ post.Text|e }}</div>
-		<!--{% if logged_in %}
+		{% if logged_in %}
 			<form action="/savepost" method = "post">
 				<input type="hidden" name="post.id" value="{{ post._id|e }}">
 				<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
 			</form>
 		{% else %}
 			<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
-		{% endif %}-->
+		{% endif %}
 	</div>
   {% endfor %}
 </div>
