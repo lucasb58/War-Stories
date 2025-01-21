@@ -4,6 +4,7 @@ body {
 
 h1 {
 	font-family: "Lucida Handwriting";
+}
 #content {
      margin-left: 20px;
 }
@@ -30,3 +31,6 @@ h1 {
   	margin: 20px;
 }
 
+#message {
+	visibility: hidden;
+}

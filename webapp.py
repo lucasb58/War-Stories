@@ -56,10 +56,37 @@ def inject_logged_in():
 
 @app.route('/')
 def home():
+    #check=""
+    #if 'user_data' in session and "savepost" in request.form:
+    #    check = "1"
+    #elif 'user_data'=="" and "savepost" in request.form:
+       #check = "0"
+    #print(check)
     posts=[]
     for doc in collection.find():
         posts.append(doc)
     return render_template('home.html', posts=posts)
+    
+@app.route('/savepost', methods=['GET','POST'])
+def savepost():
+    if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+        if "savepost" in request.form:
+            holder=session['user_data']['login']
+            result = collection.update_one(
+                {"_id": ObjectId(request.form["post.id"])},
+                {"$push": {"savedby": holder}}
+            )
+        savedposts=[]
+        for doc in collection.find():
+            for user in doc['savedby']:
+               if session['user_data']['login']==user:
+                    savedposts.append(doc)
+        return render_template('savepost.html', savedposts=savedposts)
+    else:
+        user_data_pprint = '';
+    return render_template('savepost.html')
+
 
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
@@ -67,6 +94,7 @@ def login():
     return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #Remove once done running locally
+
 
 @app.route('/logout')
 def logout():
