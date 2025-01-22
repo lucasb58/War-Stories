@@ -25,11 +25,21 @@ received along the way. Have fun discovering the wonders and experiences of war 
   			{{ post.Author|e }}
   		</div>
 		<div class="card-body">{{ post.Text|e }}</div>
-
-
-		<label class = "show" > Add a comment </label>
-	
-		<div id="commentbox">			
+		
+		<div class="buttons">
+			<button type="button" class="btn btn-warning show" style="width:10%" >Add a comment</button>
+			
+			{% if logged_in %}
+				<form action="/savepost" method = "post">
+					<input type="hidden" name="post.id" value="{{ post._id|e }}">
+					<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
+				</form>
+			{% else %}
+				<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
+			{% endif %}
+		</div>
+		
+		<div class="commentbox">			
 			<form action="/addcomments" method="post">
   					<br>
   					<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
@@ -39,23 +49,17 @@ received along the way. Have fun discovering the wonders and experiences of war 
 			</form>
 		</div>
 		
-		<label>Comments</label>
-		{% for comments in post.Comments %}
-		{{ comments.user|e }}
+		<div class="commentr">
+			<div class="commentss">
+				<label>Comments</label>
+					{% for comments in post.Comments %}
+					{{ comments.user|e }}
+					<br>
+					{{ comments.text|e }} 
+					{% endfor %}
+			</div>	
+		</div>
 		<br>
-		{{ comments.text|e }} 
-		{% endfor %}
-		
-		<br>
-  
-		{% if logged_in %}
-			<form action="/savepost" method = "post">
-				<input type="hidden" name="post.id" value="{{ post._id|e }}">
-				<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
-			</form>
-		{% else %}
-			<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
-		{% endif %}
 
 	</div>
   {% endfor %}

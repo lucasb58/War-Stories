@@ -29,9 +29,14 @@ color:white;
 
 .blogs{
 	background-color: rgb(55, 59, 56);
-  	 border: 5px solid white;
+  	border: 5px solid white;
+  	border-style: groove;
   	padding: 50px;
-  	margin: 20px;
+  	margin:20px;
+}
+
+.textbox{
+
 }
 
 
@@ -47,6 +52,36 @@ color:white;
 	visibility: hidden;
 }
 
-#commentbox{
-	visibility: hidden;
+.commentbox{
+	display: none;
+  	padding: 10px;
+  	margin: 8px;
+  	box-sizing: border-box;
+  	background-color: rgb(28, 28, 27);
+  	color: white;
+  	border: 5px solid white;
+}
+
+.commentr{
+	padding: 10px;
+  	margin: 8px;
+  	box-sizing: border-box;
+  	background-color: rgb(123, 125, 122);
+  	color: white;
+  	border: 5px solid white;
+}
+
+.commentss{
+	padding: 10px;
+  	margin: 8px;
+  	box-sizing: border-box;
+  	background-color: rgb(42, 43, 41);
+  	color: white;
+  	border: 5px solid white;
+}
+
+.button{
+ 	display:inline;
+ 	padding: 10px;
+	margin: 8px;
 }
