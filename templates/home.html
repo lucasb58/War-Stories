@@ -7,7 +7,7 @@
   <h1>Home</h1>
 </div>
 
-<p>Welcome to our forum! This site is meant for people to either share their own war stories or those of 
+<p class="words">Welcome to our forum! This site is meant for people to either share their own war stories or those of 
 other people they know personally or know of. Users are able to talk about both the gruesome and gory parts
 of war and the powerful stories of heroes. They are also able to share the metals and awards that were
 received along the way. Have fun discovering the wonders and experiences of war life!</p>
@@ -20,16 +20,16 @@ received along the way. Have fun discovering the wonders and experiences of war 
 
 <div class="container mt-3">
   {% for post in posts %}
-  <div class="card-header">
-  {{ post.Author|e }}
-  </div>
-	<div class="card">
+	<div class="card words blogs ">
+		<div class="card-header">
+  			{{ post.Author|e }}
+  		</div>
 		<div class="card-body">{{ post.Text|e }}</div>
 
 
 		<label class = "show" > Add a comment </label>
 	
-		<div>			
+		<div id="commentbox">			
 			<form action="/addcomments" method="post">
   					<br>
   					<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
