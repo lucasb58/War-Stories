@@ -7,7 +7,7 @@
   <h1>Home</h1>
 </div>
 
-<p>Welcome to our forum! This site is meant for people to either share their own war stories or those of 
+<p class="words">Welcome to our forum! This site is meant for people to either share their own war stories or those of 
 other people they know personally or know of. Users are able to talk about both the gruesome and gory parts
 of war and the powerful stories of heroes. They are also able to share the metals and awards that were
 received along the way. Have fun discovering the wonders and experiences of war life!</p>
@@ -20,11 +20,34 @@ received along the way. Have fun discovering the wonders and experiences of war 
 
 <div class="container mt-3">
   {% for post in posts %}
-  <div class="card-header">
-  {{ post.Author|e }}
-  </div>
-	<div class="card">
+	<div class="card words blogs ">
+		<div class="card-header">
+  			{{ post.Author|e }}
+  		</div>
 		<div class="card-body">{{ post.Text|e }}</div>
+
+
+		<label class = "show" > Add a comment </label>
+	
+		<div id="commentbox">			
+			<form action="/addcomments" method="post">
+  					<br>
+  					<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
+  					<br>
+  					<input type="hidden" name="post.id" value= "{{ post._id|e }}">
+  					<input type="submit" value="Submit">
+			</form>
+		</div>
+		
+		<label>Comments</label>
+		{% for comments in post.Comments %}
+		{{ comments.user|e }}
+		<br>
+		{{ comments.text|e }} 
+		{% endfor %}
+		
+		<br>
+  
 		{% if logged_in %}
 			<form action="/savepost" method = "post">
 				<input type="hidden" name="post.id" value="{{ post._id|e }}">
@@ -33,6 +56,7 @@ received along the way. Have fun discovering the wonders and experiences of war 
 		{% else %}
 			<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
 		{% endif %}
+
 	</div>
   {% endfor %}
 </div>
