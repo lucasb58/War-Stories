@@ -1,24 +1,20 @@
 {% extends "layout.html" %}
 
-{% block title %}post{% endblock %}
+{% block title %}Post{% endblock %}
 
 {% block content %}
   <h1>This is your place to share your war stories!</h1>
 
-<form action="/post" method="post">
-  <label for="prompt">Type Away:</label>
-  <br>
-  <input type="text" name="writing" >
-  <br>
-  <input type="submit" value="Submit">
-</form> 
-
-<form action="/post" method="post">
-  <label for="prompt">Upload a photo to go with your post:</label>
-  <br>
-  <input type="text" name="writing" >
-  <br>
-  <input type="submit" value="Submit">
-</form> 
+  <form action="/post" method="post" enctype="multipart/form-data">
+    <label for="writing">Type Away:</label>
+    <br>
+    <textarea name="writing" rows="4" cols="50" required></textarea>
+    <br>
+    <label for="photo">Upload a photo to go with your post:</label>
+    <br>
+    <input type="file" name="photo" accept="image/*">
+    <br>
+    <input type="submit" value="Submit">
+  </form>
 
 {% endblock %}
