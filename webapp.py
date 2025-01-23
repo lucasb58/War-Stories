@@ -1,90 +1,119 @@
 import pymongo
-from flask import Flask, redirect, url_for, session, request, jsonify, render_template
+from flask import Flask, redirect, url_for, session, request, jsonify
 from flask_oauthlib.client import OAuth
+#from flask_oauthlib.contrib.apps import github #import to make requests to GitHub's OAuth
+from flask import render_template
 from bson.objectid import ObjectId
+
 import pprint
 import os
-from werkzeug.utils import secure_filename
+
+# This code originally from https://github.com/lepture/flask-oauthlib/blob/master/example/github.py
+# Edited by P. Conrad for SPIS 2016 to add getting Client Id and Secret from
+# environment variables, so that this will work on Heroku.
+# Edited by S. Adams for Designing Software for the Web to add comments and remove flash messaging
 
 app = Flask(__name__)
 
-app.run(debug = False)
+app.debug = False #Change this to False for production
 
-
-app.secret_key = os.environ['SECRET_KEY']
+app.secret_key = os.environ['SECRET_KEY'] #used to sign session cookies
 oauth = OAuth(app)
-
+oauth.init_app(app) #initialize the app to be able to make requests for user information
+#Set up GitHub as OAuth provider
 github = oauth.remote_app(
     'github',
-    consumer_key=os.environ['GITHUB_CLIENT_ID'],
-    consumer_secret=os.environ['GITHUB_CLIENT_SECRET'],
-    request_token_params={'scope': 'user:email'},
+    consumer_key=os.environ['GITHUB_CLIENT_ID'], #your web app's "username" for github's OAuth
+    consumer_secret=os.environ['GITHUB_CLIENT_SECRET'],#your web app's "password" for github's OAuth
+    request_token_params={'scope': 'user:email'}, #request read-only access to the user's email.  For a list of possible scopes, see developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps
     base_url='https://api.github.com/',
     request_token_url=None,
     access_token_method='POST',
     access_token_url='https://github.com/login/oauth/access_token',  
-    authorize_url='https://github.com/login/oauth/authorize'
+    authorize_url='https://github.com/login/oauth/authorize' #URL for github's OAuth login
 )
-
 connection_string = os.environ["MONGO_CONNECTION_STRING"]
 db_name = os.environ["MONGO_DBNAME"]
 
 client = pymongo.MongoClient(connection_string)
 db = client[db_name]
-collection = db['Posts']
+collection = db['Posts'] #1. put the name of your collection in the quotes
 
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+# Send a ping to confirm a successful connection
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
 
+
+#context processors run before templates are rendered and add variable(s) to the template's context
+#context processors must return a dictionary 
+#this context processor adds the variable logged_in to the conext for all templates
 @app.context_processor
 def inject_logged_in():
-    return {"logged_in": 'github_token' in session}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    is_logged_in = 'github_token' in session #this will be true if the token is in the session and false otherwise
+    return {"logged_in":is_logged_in}
 
 @app.route('/')
 def home():
-    posts = list(collection.find())
+    #check=""
+    #if 'user_data' in session and "savepost" in request.form:
+    #    check = "1"
+    #elif 'user_data'=="" and "savepost" in request.form:
+       #check = "0"
+    #print(check)
+    posts=[]
+    for doc in collection.find():
+        posts.append(doc)
     return render_template('home.html', posts=posts)
-
+    
 @app.route('/savepost', methods=['GET','POST'])
 def savepost():
     if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
         if "savepost" in request.form:
-            holder = session['user_data']['login']
+            holder=session['user_data']['login']
             result = collection.update_one(
                 {"_id": ObjectId(request.form["post.id"])},
                 {"$push": {"savedby": holder}}
             )
-        savedposts = [doc for doc in collection.find() if session['user_data']['login'] in doc.get('savedby', [])]
+        savedposts=[]
+        for doc in collection.find():
+            for user in doc['savedby']:
+               if session['user_data']['login']==user and doc not in savedposts:
+                    savedposts.append(doc)
         return render_template('savepost.html', savedposts=savedposts)
+    else:
+        user_data_pprint = '';
     return render_template('savepost.html')
-
 @app.route('/unsavepost', methods=['GET', 'POST'])
 def unsavepost():
     if 'user_data' in session:
-        if "unsavepost" in request.form:
-            holder = session['user_data']['login']
-            result = collection.update_one(
-                {"_id": ObjectId(request.form["post.id"])},
-                {"$pull": {"savedby": holder}}
-            )
-        savedposts = [doc for doc in collection.find() if session['user_data']['login'] in doc.get('savedby', [])]
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+        holder=session['user_data']['login']
+        result = collection.update_one(
+            {"_id": ObjectId(request.form["post.id"])},
+            {"$pull": {"savedby": holder}}
+        )
+        savedposts=[]
+        for doc in collection.find():
+            for user in doc['savedby']:
+               if session['user_data']['login']==user and doc not in savedposts:
+                    savedposts.append(doc)
         return render_template('savepost.html', savedposts=savedposts)
+    else:
+        user_data_pprint = '';
     return render_template('savepost.html')
+    
 
+#redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
 def login():   
-    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http'))
+    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
+
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #Remove once done running locally
+
 
 @app.route('/logout')
 def logout():
@@ -95,53 +124,56 @@ def logout():
 def authorized():
     resp = github.authorized_response()
     if resp is None:
+        #session.clear()
         message = 'Access denied: reason=' + request.args['error'] + ' error=' + request.args['error_description'] + ' full=' + pprint.pformat(request.args)      
     else:
         try:
-            session['github_token'] = (resp['access_token'], '')
-            session['user_data'] = github.get('user').data
-            message = 'You were successfully logged in as ' + session['user_data']['login'] + '.'
+            session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
+            session['user_data']=github.get('user').data
+            #pprint.pprint(vars(github['/email']))
+            #pprint.pprint(vars(github['api/2/accounts/profile/']))
+            print(session)
+            message='You were successfully logged in as ' + session['user_data']['login'] + '.'
+            print("logged in")
         except Exception as inst:
+            #session.clear()
             print(inst)
-            message = 'Unable to login, please try again.'
+            message='Unable to login, please try again.  '
     return render_template('message.html', message=message)
+
 
 @app.route('/post', methods=['GET','POST'])
 def renderPost():
-    if 'user_data' not in session:
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        writing = request.form.get('writing')
-        author = session['user_data']['login']
-        
-        doc = {"Author": author, 'Text': writing, "savedby": [], "Comments": []}
-        
-        if 'photo' in request.files:
-            file = request.files['photo']
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(file_path)
-                doc['ImagePath'] = 'uploads/' + filename
-
-        collection.insert_one(doc)
-        return redirect(url_for('home'))
-
-    return render_template('post.html')
-
+	if 'user_data' in session:
+		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+	else:
+		user_data_pprint = '';
+	if "writing" in request.form:
+		print(session)
+		session["writing"]=request.form['writing']
+		author=session['user_data']['login']
+		doc = {"Author":author,'Text':request.form['writing'], "savedby": [], "Comments": []}
+		collection.insert_one(doc)
+		print(request.form['writing'])
+		return redirect(url_for('home'))
+	return render_template('post.html', dump_user_data=user_data_pprint)
+	
 @app.route('/logintopost')
 def renderLogintopost():
-    return render_template('logintopost.html')
+    if 'user_data' in session:
+        user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+    else:
+          user_data_pprint = '';
+    return render_template('logintopost.html', dump_user_data=user_data_pprint)
 
 @app.route('/googleb4c3aeedcc2dd103.html')
 def render_google_verification():
     return render_template('googleb4c3aeedcc2dd103.html')
 
+#the tokengetter is automatically called to check who is logged in.
 @github.tokengetter
 def get_github_oauth_token():
-    return session.get('github_token')
+    return session['github_token']
 
 if __name__ == '__main__':
     app.run()
-
