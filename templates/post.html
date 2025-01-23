@@ -3,18 +3,19 @@
 {% block title %}post{% endblock %}
 
 {% block content %}
-  <h1>This is your place to share your war stories!</h1>
+
+  <h1 class= "heading">This is your place to share your War Stories</h1>
 
 <form action="/post" method="post">
-  <label for="prompt">Type Away:</label>
+  <label for="prompt" class="words">Type Away:</label>
   <br>
-  <textarea class="form-control" rows="3" id="writing" name="writing"></textarea>
+  <textarea class="form-control" style="width: 75%;" rows="3" id="writing" name="writing"></textarea>
   <br>
   <input type="submit" value="Submit">
 </form> 
 
 <form action="/post" method="post">
-  <label for="prompt">Upload a photo to go with your post:</label>
+  <label for="prompt" class="words">Upload a photo to go with your post:</label>
   <br>
   <input type="text" name="writing" >
   <br>
