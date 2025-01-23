@@ -56,12 +56,6 @@ def inject_logged_in():
 
 @app.route('/')
 def home():
-    #check=""
-    #if 'user_data' in session and "savepost" in request.form:
-    #    check = "1"
-    #elif 'user_data'=="" and "savepost" in request.form:
-       #check = "0"
-    #print(check)
     posts=[]
     for doc in collection.find():
         posts.append(doc)
@@ -109,10 +103,7 @@ def unsavepost():
 #redirect to GitHub's OAuth page and confirm callback URL
 @app.route('/login')
 def login():   
-    return github.authorize(callback=url_for('authorized', _external=True, _scheme='http')) #callback URL must match the pre-configured callback URL
-
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' #Remove once done running locally
-
+    return github.authorize(callback=url_for('authorized', _external=True, _scheme='https')) #callback URL must match the pre-configured callback URL
 
 @app.route('/logout')
 def logout():
