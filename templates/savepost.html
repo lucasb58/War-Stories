@@ -14,7 +14,10 @@
   </div>
 	<div class="card">
 		<div class="card-body">{{ savedposts.Text|e }}</div>
+		<form action = "/unsavepost" method="post">
+		<input type="hidden" name="post.id" value="{{ savedposts._id|e }}">
 		<button type="submit" class="btn btn-warning" style="width: 10%;" name="unsavepost" value="submit" >Unsave</button>
+		</form>
 	</div>
   {% endfor %}
 </div>

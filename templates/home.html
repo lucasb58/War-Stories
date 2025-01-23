@@ -14,12 +14,31 @@ received along the way. Have fun discovering the wonders and experiences of war 
 
 <div id="message" class="d-flex justify-content-center align-items-center">
   <div class="alert alert-info w-25">
-	<strong>Hi There!</strong> Make sure to log in before saving or creating posts!
+    <strong>Hi There!</strong> Make sure to log in before saving or creating posts!
   </div>
 </div>
 
 <div class="container mt-3">
   {% for post in posts %}
+  <div class="card mb-3">
+    <div class="card-header">
+      {{ post.Author|e }}
+    </div>
+    <div class="card-body">
+      <p class="card-text">{{ post.Text|e }}</p>
+      {% if post.ImagePath %}
+        <img src="{{ url_for('static', filename=post.ImagePath) }}" alt="Post image" class="img-fluid mb-3">
+      {% endif %}
+      {% if logged_in %}
+        <form action="/savepost" method="post">
+          <input type="hidden" name="post.id" value="{{ post._id|e }}">
+          <button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit">Save</button>
+        </form>
+      {% else %}
+        <button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit">Save</button>
+      {% endif %}
+    </div>
+  </div>
 	<div class="card words blogs ">
 		<div class="card-header">
   			{{ post.Author|e }}
@@ -75,5 +94,6 @@ received along the way. Have fun discovering the wonders and experiences of war 
 	</div>
   {% endfor %}
 </div>
-	
+
 {% endblock %}
+
