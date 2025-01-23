@@ -4,7 +4,6 @@ from flask_oauthlib.client import OAuth
 #from flask_oauthlib.contrib.apps import github #import to make requests to GitHub's OAuth
 from flask import render_template
 from bson.objectid import ObjectId
-
 import pprint
 import os
 
@@ -149,12 +148,10 @@ def renderPost():
 	else:
 		user_data_pprint = '';
 	if "writing" in request.form:
-		print(session)
 		session["writing"]=request.form['writing']
 		author=session['user_data']['login']
 		doc = {"Author":author,'Text':request.form['writing'], "savedby": [], "Comments": []}
 		collection.insert_one(doc)
-		print(request.form['writing'])
 		return redirect(url_for('home'))
 	return render_template('post.html', dump_user_data=user_data_pprint)
 	
@@ -165,6 +162,23 @@ def renderLogintopost():
     else:
           user_data_pprint = '';
     return render_template('logintopost.html', dump_user_data=user_data_pprint)
+    
+@app.route('/addcomments', methods=['GET','POST'])
+def addComments():
+	if 'user_data' in session:
+		user_data_pprint = pprint.pformat(session['user_data'])#format the user data nicely
+	else:
+		user_data_pprint = '';
+	parent_filter = {'_id': request.form['post.id']}
+	if "comments" in request.form:
+		user=session['user_data']['login']
+		new_sub_document = { "user": user,'text': request.form['comments']}
+		result = collection.update_one(
+    		{"_id": ObjectId(request.form["post.id"])},
+    		{"$push": {"Comments": new_sub_document}}
+		)
+		return redirect(url_for('home'))
+	return redirect(url_for('home'))
 
 @app.route('/googleb4c3aeedcc2dd103.html')
 def render_google_verification():

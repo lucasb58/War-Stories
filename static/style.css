@@ -1,5 +1,5 @@
 body {
-	background-color: #bed4f7;
+	background-color: rgb(40, 43, 41);
 }
 
 h1 {
@@ -7,6 +7,10 @@ h1 {
 }
 #content {
      margin-left: 20px;
+}
+
+.words{
+color:white;
 }
 
 .button {
@@ -23,6 +27,14 @@ h1 {
   color: white;
 }
 
+.blogs{
+	background-color: rgb(55, 59, 56);
+  	 border: 5px solid white;
+  	padding: 50px;
+  	margin: 20px;
+}
+
+
 .post-box{
 	display: none;
 	background-color: white;
@@ -32,5 +44,9 @@ h1 {
 }
 
 #message {
+	visibility: hidden;
+}
+
+#commentbox{
 	visibility: hidden;
 }
