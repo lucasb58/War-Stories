@@ -3,11 +3,11 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="home">
+<div class="home heading">
   <h1>Home</h1>
 </div>
 
-<p class="words">Welcome to our forum! This site is meant for people to either share their own war stories or those of 
+<p class="center">Welcome to our forum! This site is meant for people to either share their own war stories or those of 
 other people they know personally or know of. Users are able to talk about both the gruesome and gory parts
 of war and the powerful stories of heroes. They are also able to share the metals and awards that were
 received along the way. Have fun discovering the wonders and experiences of war life!</p>
@@ -26,38 +26,49 @@ received along the way. Have fun discovering the wonders and experiences of war 
   		</div>
 		<div class="card-body">{{ post.Text|e }}</div>
 		
-		<div class="buttons">
-			<button type="button" class="btn btn-warning show" style="width:10%" >Add a comment</button>
-			
-			{% if logged_in %}
-				<form action="/savepost" method = "post">
-					<input type="hidden" name="post.id" value="{{ post._id|e }}">
-					<button type="submit" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
-				</form>
-			{% else %}
-				<button type="button" id="login" class="btn btn-warning" style="width: 10%;" name="savepost" value="submit" >Save</button>
-			{% endif %}
-		</div>
+		<div class="d-flex justify-content-start">
 		
-		<div class="commentbox">			
-			<form action="/addcomments" method="post">
+		
+			
+		
+		{% if logged_in %}
+			<button type="button" class="btn btn-warning show buttons me-2" style="width: 10%" >Add a comment</button>
+			
+			<div class="commentbox">			
+				<form action="/addcomments" method="post">
   					<br>
   					<textarea class="form-control" rows="3" id="comment" name="comments"></textarea>
   					<br>
   					<input type="hidden" name="post.id" value= "{{ post._id|e }}">
   					<input type="submit" value="Submit">
-			</form>
+				</form>
+			</div>
+		{% else %}
+			<button type="button" class="btn btn-warning show buttons me-2" style="width: 10%" disabled>Add a comment</button>
+		{% endif %}
+		
+			<div>
+				{% if logged_in %}
+					<form action="/savepost" method = "post">
+						<input type="hidden" name="post.id" value="{{ post._id|e }}">
+						<button type="submit" class="btn btn-warning buttons" style="width: 10%;" name="savepost" value="submit" >Save</button>
+					</form>
+				{% else %}
+					<button type="button" class="btn btn-warning buttons" style="width: 10%;" name="savepost" value="submit" disabled >Save</button>
+				{% endif %}
+			</div>
 		</div>
 		
-		<div class="commentr">
-			<div class="commentss">
+		<br>
+		
+		<div>
 				<label>Comments</label>
+				<br>
 					{% for comments in post.Comments %}
 					{{ comments.user|e }}
 					<br>
 					{{ comments.text|e }} 
 					{% endfor %}
-			</div>	
 		</div>
 		<br>
 
